@@ -6,6 +6,10 @@
 #include <wiringPi.h>
 #include <wiringPiSPI.h>
 
+// function declarations
+int initializePiGPIO();
+int sendFrame(unsigned char *data, int length);
+
 int main()
 {
   FILE *file_ptr;
@@ -39,12 +43,19 @@ int main()
     printf("%02x ",buffer[i]); // print hex value
   }
   printf("\n");
-//   initializePiGPIO();
-//   return 0;
-// }
+  initializePiGPIO();
 
-// int initializePiGPIO()
-// {
+
+  buffer = "Greetings Professor Falken";
+  lSize = 26;
+  printf("%s\n",buffer);
+  int q = sendFrame(1,1);
+  printf("q: %s\n",q);
+  return 0;
+}
+
+int initializePiGPIO()
+{
   wiringPiSetup();  // initialize GPIO
   int fd = wiringPiSPISetup(0,1000000); // initialize SPI channel 0 at 1 MHz
   if (fd <= -1)
@@ -68,11 +79,6 @@ int main()
   // one example is shift registers. Just use the clock and MOSI outputs, and write
   // a byte at a time to the SPI device.
 
-  // try writing something to MOSI
-  // wiringPiSPIDataRW (int channel, unsigned char *data, int len) ;
-
-  // wiringPiSPIDataRW (0, *buffer, 16);
-
   return 0;
 }
 
@@ -85,3 +91,6 @@ int main()
 // The returned value is the Linux file-descriptor for the device, or -1 on error. If an 
 // error has happened, you may use the standard errno global variable to see why.
 
+int sendFrame(unsigned char *data, int length) {
+  return wiringPiSPIDataRW(0, data, length);
+}
