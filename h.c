@@ -5,24 +5,28 @@
 
 // function declarations
 int initializePiGPIO();
-int sendFrame(unsigned char *data, int length);
+int sendByteArr(int *byteArr, int length);
 
 int main()
 {
-  int byte = { 0xAA };
-  sendByte(byte);
+  int byteArr[4] = { 0xAA, 0x01, 0x02, 0x03 };
+  int length = sizeof *byteArr;
+  sendByteArr(byteArr,length);
   return 0;
 }
 
-int sendByte(int byte) {
-  int i, bit;
+int sendByteArr(int *byteArr, int length) {
+  int i, j, bit;
 
-  printf("sendByte received data %02x\n\n",byte);
+  for (j = 0; j < length; j++) {
 
-  for (i = 7; i >= 0 ; i--) {
-   printf("wha\n");
-    bit = (byte >> i) & 1;
-    printf("  bit %d is %d\n",7,bit);
+    printf("sendByte received data %02x\n\n",byteArr[j]);
+
+    for (i = 7; i >= 0 ; i--) {
+      bit = (byteArr[j] >> i) & 1;
+      printf("  bit %d is %d\n",7,bit);
+    }
+
   }
 
   return 0;
