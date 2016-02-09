@@ -13,13 +13,18 @@ int sendByteArr(int *byteArr, int length);
 
 int main()
 {
-  initializePi();
+  wiringPiSetup();
+  pinMode(12,OUTPUT);
+  pinMode(13,OUTPUT);
+  pinMode(14,OUTPUT);
+  pinMode(10,OUTPUT);
+  while(1) {
+    digitalWrite(14,HIGH);
+    delayMicroseconds(1);
+    digitalWrite(14,LOW);
+    delayMicroseconds(1);
+  }
 
-  int byteArr[6] = { 0x45, 0x00, 0x00, 0x00, 0x00, 0x95 };
-  int length = sizeof byteArr / sizeof(int);
-  printf("sizeof *byteArr is %d\n",length);
-  sendByteArr(byteArr,length);
-  return 0;
 }
 
 int sendByteArr(int *byteArr, int length) {
@@ -42,10 +47,6 @@ int sendByteArr(int *byteArr, int length) {
 
 int initializePi()
 {
-  wiringPiSetup();
-  pinMode(MOSI_pin,OUTPUT);
-  pinMode(CE0_pin,OUTPUT);
-  pinMode(SCLK_pin,OUTPUT);
   return 0;
 }
 
