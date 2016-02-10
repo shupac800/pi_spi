@@ -7,9 +7,10 @@ int initializePi();
 int sendByteArr(int *byteArr, int length);
 
 // globals
-  int MOSI_pin = 19;
-  int SCLK_pin = 23;
-  int CE0_pin = 24;
+  int MOSI_pin = 12;
+  int MISO_pin = 13;
+  int SCLK_pin = 14;
+  int CE0_pin = 10;
 
 int main()
 {

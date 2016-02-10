@@ -10,6 +10,12 @@
 int initializePiGPIO();
 int sendFrame(unsigned char *data, int length);
 
+// global declarations
+int MOSI_pin = 12;
+int MISO_pin = 13;
+int SCLK_pin = 14;
+int CE0_pin = 10;
+
 int main()
 {
   initializePiGPIO();
