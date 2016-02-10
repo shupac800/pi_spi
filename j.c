@@ -5,11 +5,9 @@
 
 // function declarations
 unsigned char initializePi();
-int sendcmd0();
 int getResponse();
 void sendByteArr(unsigned char *byteArr, int length);
 unsigned char RWBit(unsigned char bit);
-void delayLoop(int delay;);
 
 // globals
 char MOSI_pin = 12;
@@ -54,17 +52,13 @@ void sendByteArr(unsigned char *byteArr, int length) {
 
   for (j = 0; j < length; j++) {
 
-//    printf("Sending byte %02X\n",byteArr[j]);
     MISO_byte = 0;
 
     for (i = 7; i >= 0 ; i--) {
-//    printf("in loop now at i = %d\n",i);
       MOSI_bit = (byteArr[j] >> i) & 1;
-//    printf("  bit %d is %d\n",7,MOSI_bit);
       MISO_bit = RWBit(MOSI_bit);
       MISO_byte = (MISO_byte << 1) + MISO_bit;
     }
-//    printf("  Received byte %02X\n",MISO_byte);
   }
 
   digitalWrite(MOSI_pin,1); // MOSI is held high when not sending
@@ -97,10 +91,6 @@ unsigned char initializePi()
   return 0;
 }
 
-int sendcmd0()
-{
-}
-
 int getResponse()
 {
   int i, j;
@@ -108,13 +98,11 @@ int getResponse()
 
   // wait for response
   for (i = 0; i < 16; i++) {  // wait 16 clock cycles
-//  printf("Toggling clock... i=%d\n",i);
     digitalWrite(SCLK_pin,1);
     digitalWrite(SCLK_pin,0);
     char MISO_bit = digitalRead(MISO_pin);
     if (!MISO_bit) {  // return message commences
       for (j = 0; j < 8; j++) {  // next 8 bits are response
-//      printf("Got response bit %d\n",MISO_bit);
         MISO_byte = (MISO_byte << 1) + MISO_bit;
         digitalWrite(SCLK_pin,1);
         digitalWrite(SCLK_pin,0);
@@ -136,14 +124,4 @@ unsigned char RWBit(unsigned char MOSI_bit) {
 
   return MISO_bit;
 
-}
-
-void delayLoop(int delay) {
-  int i;
-
-  for (i = 0; i < delay; i++) {
-    //__asm__("nop");
-    i = i;
-  }
-  return;
 }
