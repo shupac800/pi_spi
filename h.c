@@ -1,5 +1,6 @@
 
 #include <stdio.h>
+#include <string.h>
 #include <wiringPi.h>
 
 // function declarations
@@ -18,10 +19,30 @@ void main()
 {
   initializePi();
 
-//  unsigned char byteArr[6] = { 0x45, 0x00, 0x00, 0x00, 0x00, 0x95 };
-//  int length = sizeof byteArr;
-//  printf("sizeof *byteArr is %d\n",length);
-//  sendByteArr(byteArr,length);
+  unsigned char byteArr[6] = {0x7A,0x00,0x00,0x00,0x00,0x75};
+  sendByteArr(byteArr,6);
+  // wait for response
+  int i,j;
+  unsigned char MISO_bit, MISO_byte;
+  
+  for (i = 0; i < 16; i++) {  // wait 16 clock cycles
+    printf("Toggling clock... i=%d\n",i);
+    digitalWrite(SCLK_pin,1);
+    digitalWrite(SCLK_pin,0);
+    MISO_bit = digitalRead(MISO_pin);
+    if (!MISO_bit) {  // return message commences
+      for (j = 0; j < 8; j++) {  // next 8 bits are response
+        printf("Got response bit %d\n",MISO_bit);
+        MISO_byte = (MISO_byte << 1) + MISO_bit;
+        digitalWrite(SCLK_pin,1);
+        digitalWrite(SCLK_pin,0);
+        MISO_bit = digitalRead(MISO_pin);
+      }
+      i = 16;
+      printf("Received response %02X\n",MISO_byte);
+    }
+  } 
+  
 
   // rest state
   digitalWrite(MOSI_pin,1);
