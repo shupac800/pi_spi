@@ -5,6 +5,8 @@
 
 // function declarations
 unsigned char initializePi();
+int sendcmd0();
+int getResponse();
 void sendByteArr(unsigned char *byteArr, int length);
 unsigned char RWBit(unsigned char bit);
 void delayLoop(int delay;);
@@ -17,32 +19,27 @@ char CE0_pin = 10;
 
 void main()
 {
+  unsigned char byteArr[6];
+  unsigned char cmd0[6] = { 0x40, 0x00, 0x00, 0x00, 0x00, 0x95 };
+  unsigned char cmd8[6] = { 0x48, 0x00, 0x00, 0x01, 0xAA, 0x0F };
+  unsigned char cmd58[6] = {0x7A,0x00,0x00,0x00,0x00,0x75};
+
   initializePi();
 
-  unsigned char byteArr[6] = {0x7A,0x00,0x00,0x00,0x00,0x75};
+  // send CMD0
+  memcpy(byteArr,cmd0,6);
   sendByteArr(byteArr,6);
-  // wait for response
-  int i,j;
-  unsigned char MISO_bit, MISO_byte;
-  
-  for (i = 0; i < 16; i++) {  // wait 16 clock cycles
-//  printf("Toggling clock... i=%d\n",i);
-    digitalWrite(SCLK_pin,1);
-    digitalWrite(SCLK_pin,0);
-    MISO_bit = digitalRead(MISO_pin);
-    if (!MISO_bit) {  // return message commences
-      for (j = 0; j < 8; j++) {  // next 8 bits are response
-//      printf("Got response bit %d\n",MISO_bit);
-        MISO_byte = (MISO_byte << 1) + MISO_bit;
-        digitalWrite(SCLK_pin,1);
-        digitalWrite(SCLK_pin,0);
-        MISO_bit = digitalRead(MISO_pin);
-      }
-      i = 16;
-      printf("Received response %02X\n",MISO_byte);
-    }
-  } 
-  
+  printf("CMD0 generates response %02X\n",getResponse());
+
+  // send CMD8
+  memcpy(byteArr,cmd8,6);
+  sendByteArr(byteArr,6);
+  printf("CMD8 generates response %02X\n",getResponse());
+
+  // send CMD58
+  memcpy(byteArr,cmd58,6);
+  sendByteArr(byteArr,6);
+  printf("CMD58 generates response %02X\n",getResponse());
 
   // rest state
   digitalWrite(MOSI_pin,1);
@@ -83,23 +80,31 @@ unsigned char initializePi()
   pinMode(MISO_pin,INPUT);
   pinMode(CE0_pin,OUTPUT);
   pinMode(SCLK_pin,OUTPUT);
-  int i, j;
-  unsigned char MISO_byte;
 
   digitalWrite(SCLK_pin,0);  // initialize clock as LOW
   digitalWrite(MOSI_pin,1);  // MOSI is HIGH when no message is being sent
   digitalWrite(CE0_pin,1);   // chip select is HIGH during initialization
 
   // place card in SPI mode
+  int i;
   for (i = 0; i < 74; i++) {
     digitalWrite(SCLK_pin,1);
     digitalWrite(SCLK_pin,0);
   }
 
   digitalWrite(CE0_pin,0);
-  // send CMD0
-  unsigned char byteArr[6] = { 0x40, 0x00, 0x00, 0x00, 0x00, 0x95 };
-  sendByteArr(byteArr,6);
+
+  return 0;
+}
+
+int sendcmd0()
+{
+}
+
+int getResponse()
+{
+  int i, j;
+  unsigned char MISO_byte;
 
   // wait for response
   for (i = 0; i < 16; i++) {  // wait 16 clock cycles
@@ -115,12 +120,10 @@ unsigned char initializePi()
         digitalWrite(SCLK_pin,0);
         MISO_bit = digitalRead(MISO_pin);
       }
-      printf("Received response %02X\n",MISO_byte);
       return MISO_byte;
     }
   } 
-  printf("No response received.\n");
-  return 0;
+  return -1; // no response received
 }
 
 unsigned char RWBit(unsigned char MOSI_bit) {
